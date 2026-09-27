@@ -48,7 +48,10 @@ jobs:
 
       - name: Commit regenerated files
         run: |
-          if git diff --quiet -- index.html resume.pdf; then
+          test -f resume.pdf || { echo "ERROR: resume.pdf was not generated"; exit 1; }
+          # git status (NOT git diff): git diff cannot see NEW untracked files
+          # such as a freshly generated resume.pdf and would silently skip it.
+          if [ -z "$(git status --porcelain -- index.html resume.pdf)" ]; then
             echo "index.html / resume.pdf already up to date - nothing to commit."
             exit 0
           fi
