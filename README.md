@@ -21,25 +21,35 @@ GitHub Actions 会自动：
 
 ## 页面右下角的「保存为 PDF」按钮
 
-点击按钮会调起浏览器打印界面，选择「另存为 PDF」即可导出与页面完全一致的
-A4 简历。打印样式已内置：A4 纸张、页边距、按钮在打印时自动隐藏。
+点击按钮**直接下载 `resume.pdf`**（浏览器立即开始下载，文件名
+`个人简历-赵浩.pdf`），不再调起浏览器打印界面。这份 PDF 由 weasyprint
+从页面精确渲染生成，因此：
+
+- 颜色 100% 保留（模块蓝底、标签灰底、字色）；
+- **没有**浏览器打印页眉页脚（网址、日期、标题都不会出现）；
+- A4 纸张与页边距与页面设置完全一致。
+
+`resume.pdf` 由 `build_html.py` 在每次构建时自动重新生成，与
+`index.html` 始终同源同步。
 
 ## 本地重新生成（可选）
 
 ```bash
-pip install python-docx
+pip install python-docx weasyprint
 python build_html.py
 ```
 
 脚本自带一致性校验：Word 中每一段文字都必须按原顺序出现在 HTML 中，
-否则以非零退出码报错。
+否则以非零退出码报错。装了 weasyprint 时还会同时重新生成 `resume.pdf`
+（Windows 需先安装 pango，如 `pacman -S mingw-w64-ucrt-x86_64-pango`）。
 
 ## 目录结构
 
 ```
 简历.docx                            # 唯一内容源（只编辑这个文件）
 index.html                           # 自动生成的简历页面（勿手工编辑）
-build_html.py                        # Word → HTML 生成脚本
+resume.pdf                           # 自动生成的下载版 PDF（勿手工编辑）
+build_html.py                        # Word → HTML/PDF 生成脚本
 .github/workflows/build-resume.yml   # 自动构建工作流
 ```
 

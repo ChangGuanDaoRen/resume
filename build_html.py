@@ -31,7 +31,7 @@ DOCX = os.path.join(BASE, "简历.docx")
 HTML_OUT = os.path.join(BASE, "index.html")
 
 # ---- design constants (used only as fallbacks / chrome around Word content) --
-BODY_FONT = '"SimSun", "宋体", "Songti SC", serif'
+BODY_FONT = '"SimSun", "宋体", "Songti SC", "Noto Serif CJK SC", serif'
 BORDER = "#B8C4D8"
 DEFAULT_PT = 10.5
 TITLE_PT = 20
@@ -480,6 +480,10 @@ CSS = """  * { margin: 0; padding: 0; box-sizing: border-box; }
   p.line { font-size: %(dsize)s; line-height: 1.5; margin: 0 0 6px; }
 
   /* ---- floating "save as PDF" button (screen only) ---- */
+  /* an <a download> pointing at the pre-rendered resume.pdf: clicking it
+     starts a browser download directly - colors, margins and page content
+     are exactly what weasyprint rendered, with NO browser print headers
+     (URL / date / title) and no "background graphics" surprises. */
   #save-pdf {
     position: fixed;
     right: 20px;
@@ -494,10 +498,13 @@ CSS = """  * { margin: 0; padding: 0; box-sizing: border-box; }
     border-radius: 999px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
     cursor: pointer;
+    text-decoration: none;
   }
   #save-pdf:hover { background: #163A75; }
 
-  /* ---- print / Save-as-PDF ---- */
+  /* ---- print / Ctrl+P fallback ---- */
+  /* keep background colors when the page is printed anyway */
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   @page { size: A4; margin: 1.2cm 1.6cm 1.1cm 1.6cm; }
   @media print {
     html, body { background: #fff; }
@@ -529,7 +536,7 @@ __CSS__
   <div class="page">
 __BODY__
   </div>
-  <button id="save-pdf" type="button" onclick="window.print()">保存为 PDF</button>
+  <a id="save-pdf" href="resume.pdf" download="个人简历-赵浩.pdf">保存为 PDF</a>
 </body>
 </html>
 """.replace("__CSS__", CSS)
@@ -573,6 +580,27 @@ def check(html_doc, doc):
     return len(texts), missing, order_ok
 
 
+PDF_OUT = "resume.pdf"
+
+
+def build_pdf():
+    """Regenerate resume.pdf from index.html (best effort).
+
+    weasyprint renders exactly what the CSS defines: background colors kept,
+    the #save-pdf button hidden via @media print, A4 margins from @page, and
+    NO browser print headers (URL / date / title). If weasyprint is not
+    installed the existing resume.pdf (if any) is left untouched.
+    """
+    try:
+        import weasyprint
+    except Exception as e:
+        print("PDF_SKIPPED weasyprint unavailable (%s)" % e.__class__.__name__)
+        return False
+    weasyprint.HTML(filename=HTML_OUT).write_pdf(PDF_OUT)
+    print("PDF_OK %s bytes=%d" % (PDF_OUT, os.path.getsize(PDF_OUT)))
+    return True
+
+
 def main():
     if not os.path.exists(DOCX):
         print("ERROR: 简历.docx not found at %s" % DOCX)
@@ -586,6 +614,7 @@ def main():
         print("  MISSING: %r" % m)
     if missing or not order_ok:
         return 1
+    build_pdf()
     return 0
 
 
