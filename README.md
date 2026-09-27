@@ -13,9 +13,10 @@ GitHub Actions 会自动：
 1. 读取新的 `简历.docx`；
 2. 重新生成 `index.html`，与 Word 内容**一比一对应**：表格结构、合并单元格、
    底纹颜色、加粗、字号、字色、对齐方式全部跟随 Word 文件；
-3. 把新的 `index.html` 提交回仓库，GitHub Pages 随即自动更新。
+3. 同步重新生成可直接下载的 `resume.pdf`；
+4. 把新的 `index.html`、`resume.pdf` 提交回仓库，GitHub Pages 随即自动更新。
 
-全程无需手工编辑任何 HTML。
+全程无需手工编辑任何 HTML / PDF。
 
 > 手动触发：仓库 **Actions** 页 → 「Build resume page」→ **Run workflow**。
 
@@ -30,7 +31,9 @@ GitHub Actions 会自动：
 - A4 纸张与页边距与页面设置完全一致。
 
 `resume.pdf` 由 `build_html.py` 在每次构建时自动重新生成，与
-`index.html` 始终同源同步。
+`index.html` 始终同源同步。**你不需要手动上传 `resume.pdf`**——工作流每次
+构建都会自动生成并提交它（首次启用时也一样：更新 `build_html.py` 和工作流
+文件后，第一次运行就会自动创建）。
 
 ## 本地重新生成（可选）
 
@@ -48,7 +51,7 @@ python build_html.py
 ```
 简历.docx                            # 唯一内容源（只编辑这个文件）
 index.html                           # 自动生成的简历页面（勿手工编辑）
-resume.pdf                           # 自动生成的下载版 PDF（勿手工编辑）
+resume.pdf                           # 自动生成的下载版 PDF（工作流维护，无需手动上传）
 build_html.py                        # Word → HTML/PDF 生成脚本
 .github/workflows/build-resume.yml   # 自动构建工作流
 ```
