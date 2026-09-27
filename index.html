@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
-    font-family: "SimSun", "宋体", "Songti SC", serif;
+    font-family: "SimSun", "宋体", "Songti SC", "Noto Serif CJK SC", serif;
     color: #1A1A1A;
     background: #EEF1F6;
     -webkit-text-size-adjust: 100%;
@@ -19,7 +19,7 @@
     padding: 0.6cm 0 1.4cm;
   }
   h1.title {
-    font-family: "SimSun", "宋体", "Songti SC", serif;
+    font-family: "SimSun", "宋体", "Songti SC", "Noto Serif CJK SC", serif;
     margin: 0 0 14px;
   }
   table.resume {
@@ -42,13 +42,17 @@
   p.line { font-size: 10.5pt; line-height: 1.5; margin: 0 0 6px; }
 
   /* ---- floating "save as PDF" button (screen only) ---- */
+  /* an <a download> pointing at the pre-rendered resume.pdf: clicking it
+     starts a browser download directly - colors, margins and page content
+     are exactly what weasyprint rendered, with NO browser print headers
+     (URL / date / title) and no "background graphics" surprises. */
   #save-pdf {
     position: fixed;
     right: 20px;
     bottom: 20px;
     z-index: 9999;
     padding: 11px 20px;
-    font-family: "SimSun", "宋体", "Songti SC", serif;
+    font-family: "SimSun", "宋体", "Songti SC", "Noto Serif CJK SC", serif;
     font-size: 14px;
     color: #fff;
     background: #1F4E9C;
@@ -56,10 +60,13 @@
     border-radius: 999px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
     cursor: pointer;
+    text-decoration: none;
   }
   #save-pdf:hover { background: #163A75; }
 
-  /* ---- print / Save-as-PDF ---- */
+  /* ---- print / Ctrl+P fallback ---- */
+  /* keep background colors when the page is printed anyway */
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   @page { size: A4; margin: 1.2cm 1.6cm 1.1cm 1.6cm; }
   @media print {
     html, body { background: #fff; }
@@ -191,6 +198,6 @@
       </tr>
     </table>
   </div>
-  <button id="save-pdf" type="button" onclick="window.print()">保存为 PDF</button>
+  <a id="save-pdf" href="resume.pdf" download="个人简历-赵浩.pdf">保存为 PDF</a>
 </body>
 </html>
