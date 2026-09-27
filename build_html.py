@@ -41,7 +41,7 @@ PAGE_W = "18cm"
 # ---------------------------------------------------------------------------
 # small helpers
 # ---------------------------------------------------------------------------
-_MULTISPACE = re.compile(r"[ \t\u00a0\u3000]{2,}")
+_MULTISPACE = re.compile(r"[ \t\u00a0]{2,}")
 
 
 def collapse(s):
@@ -137,6 +137,11 @@ def render_para(runs):
     Whitespace is normalised across the whole paragraph so that spaces split
     across runs behave like one string, while each run keeps its own styling.
 
+    Literal full-width spaces (U+3000) typed at the start of a paragraph are
+    treated as a manual first-line indent and converted to text-indent, so
+    they survive HTML whitespace collapsing. Real first-line indent set in
+    Word (paragraph format) is read separately in para_ind_css().
+
     When the whole paragraph shares one style (the common case) that styling is
     returned as `hoistable_css` so the caller can put it straight on the
     wrapper element instead of emitting a redundant <span>.
@@ -144,11 +149,17 @@ def render_para(runs):
     groups = group_runs(runs)
     if not groups:
         return "", ""
-    whole = collapse("".join(t for t, _ in groups)).strip()
+    raw = "".join(t for t, _ in groups)
+    lead = raw[:len(raw) - len(raw.lstrip("\u3000"))]
+    raw = raw[len(lead):]
+    whole = collapse(raw).strip()
     if not whole:
         return "", ""
+    css = run_css(groups[0][1]) if len(groups) == 1 else ""
+    if lead:
+        css = (css + ";" if css else "") + "text-indent:%gem" % len(lead)
     if len(groups) == 1:
-        return run_css(groups[0][1]), esc(whole)
+        return css, esc(whole)
     parts = []
     for i, (t, p) in enumerate(groups):
         t = collapse(t)
@@ -158,12 +169,12 @@ def render_para(runs):
             t = t.rstrip()
         if not t:
             continue
-        css = run_css(p)
-        if css:
-            parts.append('<span style="%s">%s</span>' % (css, esc(t)))
+        rcss = run_css(p)
+        if rcss:
+            parts.append('<span style="%s">%s</span>' % (rcss, esc(t)))
         else:
             parts.append(esc(t))
-    return "", "".join(parts)
+    return css, "".join(parts)
 
 
 # ---------------------------------------------------------------------------
@@ -177,6 +188,59 @@ def para_jc(p):
     return j.get(qn("w:val")) if j is not None else None
 
 
+def para_ind_css(p):
+    """Word paragraph indent (w:pPr/w:ind) -> CSS.
+
+    Chinese resumes indent the first line via paragraph FORMAT ("首行缩进2字符"),
+    not via space characters, so this attribute must be read explicitly:
+      firstLineChars=200  -> text-indent:2em   (2 characters, font-relative)
+      firstLine=420       -> text-indent:21pt  (420 twips, fallback)
+      left=120            -> margin-left:6pt   (whole-paragraph left indent)
+      hanging=*           -> out-dented first line (padding + negative indent)
+    """
+    pPr = p.find(qn("w:pPr"))
+    if pPr is None:
+        return []
+    e = pPr.find(qn("w:ind"))
+    if e is None:
+        return []
+
+    def num(attr):
+        v = e.get(qn("w:" + attr))
+        try:
+            return int(v) if v is not None else None
+        except (TypeError, ValueError):
+            return None
+
+    css = []
+    flc = num("firstLineChars")            # 1/100 char units -> em
+    fl = num("firstLine")                  # twips -> pt
+    hgc = num("hangingChars")
+    hg = num("hanging")
+    lcc = num("leftChars") or num("startChars")
+    lw = num("left") or num("start")
+
+    if hgc:
+        hang = "%gem" % (hgc / 100.0)
+    elif hg:
+        hang = "%gpt" % (hg / 20.0)
+    else:
+        hang = None
+    if hang:
+        # hanging indent: every line except the first is pushed in
+        css.append("padding-left:%s" % hang)
+        css.append("text-indent:-%s" % hang)
+    elif flc:
+        css.append("text-indent:%gem" % (flc / 100.0))
+    elif fl:
+        css.append("text-indent:%gpt" % (fl / 20.0))
+    if lcc:
+        css.append("margin-left:%gem" % (lcc / 100.0))
+    elif lw:
+        css.append("margin-left:%gpt" % (lw / 20.0))
+    return css
+
+
 def para_style(p):
     """(inline css, text-html) for a single w:p, or None when empty."""
     run_css_s, body = render_para(para_runs(p))
@@ -185,6 +249,7 @@ def para_style(p):
     css = []
     if run_css_s:
         css.append(run_css_s)
+    css.extend(para_ind_css(p))
     jc = para_jc(p)
     if jc == "center":
         css.append("text-align:center")
