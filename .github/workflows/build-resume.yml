@@ -1,0 +1,58 @@
+name: Build resume page
+
+# Word (简历.docx) is the single source of truth.
+# Push a new 简历.docx and this workflow regenerates index.html and commits it,
+# so GitHub Pages republishes automatically. No manual HTML editing, ever.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '简历.docx'
+      - 'build_html.py'
+      - '.github/workflows/build-resume.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-resume
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip python-docx
+
+      - name: Build index.html from 简历.docx
+        run: python build_html.py
+
+      - name: Commit regenerated index.html
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "index.html is already up to date - nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "chore: rebuild index.html from 简历.docx"
+          git push
+
+      - name: Summary
+        run: |
+          echo "### Resume page rebuilt" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- source: \`简历.docx\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- output: \`index.html\` ($(wc -c < index.html) bytes)" >> "$GITHUB_STEP_SUMMARY"
