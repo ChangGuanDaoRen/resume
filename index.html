@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>个人简历 - 赵浩</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    font-family: "SimSun", "宋体", serif;
+    color: #1A1A1A;
+    background: #fff;
+  }
+  @page {
+    size: A4;
+    margin: 1.2cm 1.6cm 1.1cm 1.6cm;
+  }
+  .page {
+    width: 100%;
+    max-width: 18cm;
+    margin: 0 auto;
+    padding-top: 0.4cm;
+  }
+  h1.title {
+    text-align: center;
+    font-size: 20pt;
+    font-weight: bold;
+    color: #1F4E9C;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+  }
+  table.resume {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    border: 1px solid #B8C4D8;
+  }
+  table.resume col.c1 { width: 18%; }
+  table.resume col.c2 { width: 32%; }
+  table.resume col.c3 { width: 18%; }
+  table.resume col.c4 { width: 32%; }
+  table.resume td {
+    border: 1px solid #B8C4D8;
+    padding: 5px 8px;
+    vertical-align: middle;
+    word-break: break-word;
+  }
+  tr.module td {
+    background: #EAF0F9;
+    color: #1F4E9C;
+    font-weight: bold;
+    font-size: 11pt;
+    text-align: center;
+    padding: 6px 8px;
+  }
+  tr.submodule td {
+    background: #EAF0F9;
+    color: #1F4E9C;
+    font-weight: bold;
+    font-size: 11pt;
+    text-align: center;
+  }
+  td.label {
+    background: #F2F4F8;
+    color: #555555;
+    font-weight: bold;
+    text-align: center;
+  }
+  td.value { text-align: left; }
+  td.value hr.rule {
+    border: none;
+    border-top: 1px solid #B8C4D8;
+    margin: 4px -8px;
+  }
+
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1 class="title">个人简历</h1>
+    <table class="resume">
+      <colgroup>
+        <col class="c1"><col class="c2"><col class="c3"><col class="c4">
+      </colgroup>
+
+      <tr class="module"><td colspan="4">基本信息</td></tr>
+      <tr><td class="label">姓名</td><td class="value">赵浩</td><td class="label">联系电话</td><td class="value">19358968783</td></tr>
+      <tr><td class="label">电子邮箱</td><td class="value">zhaohao@xs.ustb.edu.cn</td><td class="label">GitHub</td><td class="value">github.com/ChangGuanDaoRen</td></tr>
+      <tr class="module"><td colspan="4">个人经历</td></tr>
+      <tr><td class="label">教育背景</td><td class="value" colspan="3">北京科技大学理科试验班（拔尖人才计划）本科在读<hr class="rule">主修课程：数学分析、高等代数、理科物理、工程力学、无机化学、C 语言程序设计、概率论与数理统计<hr class="rule">学业成绩：加权平均分92.2（5/87）</td></tr>
+      <tr><td class="label">项目实践</td><td class="value" colspan="3">2026.07　人工智能算法可视化演示系统：独立开发集成式桌面GUI系统，基于EasyX构建主菜单，集成线性回归、决策树分类、K-Means聚类、LeNet-5手写数字识别、TF-IDF智能问答、大模型API调用等6个模块，设计C++界面层与Python算法层的命令行桥接机制<hr class="rule">2026.08　鹿小陇打卡小程序 &amp; 陇绣非遗宣传网站：作为鹿望秦川社会实践项目技术组成员，独立开发微信小程序并通过微信审核上线；协作搭建官方网站与非遗展示站</td></tr>
+      <tr><td class="label">所获荣誉</td><td class="value" colspan="3">2025.12　第二届学研杯大学物理强基竞赛 I 卷一等奖<hr class="rule">2026.05　北京科技大学本科 2025 级新生人民三等奖学金<hr class="rule">2025.12　北京科技大学创新创业知识竞赛一等奖</td></tr>
+      <tr class="submodule"><td colspan="4">个人技能</td></tr>
+      <tr><td class="label">编程能力</td><td class="value" colspan="3">熟练掌握 C 语言，具备基础算法设计与代码实现能力<hr class="rule">正在系统学习 Python，重点方向为数据处理与机器学习基础库。</td></tr>
+      <tr><td class="label">办公工具</td><td class="value" colspan="3">熟练使用 Office 办公套件，可独立完成文档撰写、数据处理与汇报展示。</td></tr>
+      <tr><td class="label">文献能力</td><td class="value" colspan="3">掌握中英文文献检索方法，可阅读英文专业文献，具备快速学习新知识的能力。</td></tr>
+      <tr class="module"><td colspan="4">自我评价</td></tr>
+      <tr><td class="value" colspan="4">学业基础扎实，数理逻辑与编程能力交叉优势突出，自学能力强、上手速度快。目标明确，入学即确立材料方向长期深造路线，主动寻求早期科研实践机会。</td></tr>
+    </table>
+  </div>
+  <button style="position: fixed; bottom: 10px; right: 10px; padding: 10px 20px; font-size: 16px; z-index: 9999; cursor: pointer;">下载PDF</button>
+</body>
+</html>
